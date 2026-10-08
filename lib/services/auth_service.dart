@@ -17,30 +17,30 @@ class AuthService {
 
   Session? get session => supabase.auth.currentSession;
 
-  // da el signup: el esm w el phone byt5zno f metadata,
-  // w el trigger f el database bey3ml el profile automatic (dayman patient)
+  // da el signup: bnb3t el data le Edge Function "signup" 3la el server,
+  // heya btfta7 el account confirmed (mn 8er email), w ba3d keda bn3ml login 3la tool.
+  // el trigger f el database bey3ml el profile automatic (dayman patient)
   Future<bool> signUp({
     required String fullName,
     required String email,
     required String password,
     String? phone,
   }) async {
-    final res = await supabase.auth.signUp(
-      email: email.trim(),
-      password: password,
-      data: {
+    try {
+      await supabase.functions.invoke('signup', body: {
+        'email': email.trim(),
+        'password': password,
         'full_name': fullName.trim(),
         'phone': (phone ?? '').trim().isEmpty ? null : phone!.trim(),
-      },
-    );
-    if (res.session != null) return true;
-    // law mafish session (masalan email confirmation shaghal), bngarrab login 3la tool
-    try {
-      await signIn(email, password);
-      return true;
-    } catch (_) {
-      return false; // lazem el user y-confirm el email el awel
+      });
+    } on FunctionException catch (e) {
+      // el server rad b error (masalan el email mawgood) -> nzhr el message lel user
+      final details = e.details;
+      final message = details is Map ? details['error']?.toString() : details?.toString();
+      throw AuthException(message ?? 'Sign up failed. Please try again.');
     }
+    await signIn(email, password);
+    return true;
   }
 
   // da el login function beta3t el user
