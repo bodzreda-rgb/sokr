@@ -5,11 +5,12 @@ import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/common_widgets.dart';
 import '../admin/admin_dashboard.dart';
+import '../doctor/doctor_portal.dart';
 import '../shell/main_shell.dart';
 import 'login_page.dart';
 
 // da el "bawab": by-listen 3la el auth state
-// law mafish session -> Login, law fe -> bngeb el role (admin aw patient)
+// law mafish session -> Login, law fe -> bngeb el role (admin / doctor / patient)
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
@@ -51,8 +52,12 @@ class _RoleRouterState extends State<RoleRouter> {
       body: AsyncView<UserModel>(
         future: _future,
         onRetry: () => setState(() => _future = AuthService.instance.loadProfile()),
-        // el admin yro7 el admin dashboard, w el patient yro7 el app el 3adi
-        builder: (user) => user.role == UserRoles.admin ? const AdminDashboard() : const MainShell(),
+        // kol role leh screen: admin -> admin panel, doctor -> doctor portal, patient -> el app
+        builder: (user) => switch (user.role) {
+          UserRoles.admin => const AdminDashboard(),
+          UserRoles.doctor => const DoctorPortal(),
+          _ => const MainShell(),
+        },
       ),
     );
   }

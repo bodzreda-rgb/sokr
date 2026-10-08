@@ -60,6 +60,11 @@ class MedicalService {
     await supabase.from('medical_records').delete().eq('id', record.id);
   }
 
+  // el user y3dl el record (title / type / description)
+  static Future<void> updateRecord(String id, Map<String, dynamic> values) async {
+    await supabase.from('medical_records').update(values).eq('id', id);
+  }
+
   // ---------------- health metrics ----------------
 
   static Future<List<HealthMetricModel>> getMetrics({int limit = 14}) async {
@@ -82,6 +87,15 @@ class MedicalService {
     await supabase
         .from('health_metrics')
         .insert({...values, 'patient_id': currentUserId});
+  }
+
+  // el user y3dl aw ymsa7 qeyas
+  static Future<void> updateMetric(String id, Map<String, dynamic> values) async {
+    await supabase.from('health_metrics').update(values).eq('id', id);
+  }
+
+  static Future<void> deleteMetric(String id) async {
+    await supabase.from('health_metrics').delete().eq('id', id);
   }
 
   // ---------------- favorites ----------------

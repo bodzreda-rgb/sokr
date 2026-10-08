@@ -8,6 +8,8 @@ exercises, gyms, healthy food, medical records, health status) with patient + ad
 1. Create a project on https://supabase.com.
 2. Supabase Dashboard -> **SQL Editor** -> paste all of `supabase/supabase_schema.sql` -> **Run**.
    (tables + indexes + RLS + storage bucket + triggers + demo data)
+   Then run `supabase/migration_v3.sql` the same way (doctor accounts, diet plans, gym prices
+   and subscriptions, image uploads).
 3. Supabase Dashboard -> **Authentication -> Sign In / Providers -> Email**:
    turn **Confirm email** OFF for testing (otherwise new users must confirm by email).
 4. Supabase Dashboard -> **Project Settings -> API**: copy the **Project URL** and the
@@ -31,7 +33,10 @@ flutter run --dart-define=SUPABASE_URL=https://xxxx.supabase.co --dart-define=SU
 | Role | Email |
 |------|-------|
 | Patient | patient@demo.com |
+| Doctor (Dr. Sarah Johnson) | doctor@demo.com |
 | Admin (add / edit / delete everything) | admin@demo.com |
+
+To make any user a doctor: Admin -> Doctors -> edit a doctor -> "Linked login account".
 
 ## Structure
 

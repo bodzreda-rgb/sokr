@@ -24,20 +24,21 @@ class _HealthStatusPageState extends State<HealthStatusPage> {
   @override
   void initState() {
     super.initState();
-    _future = MedicalService.getMetrics(limit: 7);
+    _future = MedicalService.getMetrics(limit: 60);
     if (widget.openAddDialog) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _addReading());
     }
   }
 
-  void _reload() => setState(() => _future = MedicalService.getMetrics(limit: 7));
+  void _reload() => setState(() => _future = MedicalService.getMetrics(limit: 60));
 
-  Future<void> _addReading() async {
+  // law existing mawgood yb2a edit, law la2 yb2a add
+  Future<void> _addReading([HealthMetricModel? existing]) async {
     final saved = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => const AddMetricSheet(),
+      builder: (_) => AddMetricSheet(existing: existing),
     );
     if (saved == true) {
       _reload();
@@ -50,7 +51,7 @@ class _HealthStatusPageState extends State<HealthStatusPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Health Status'),
-        actions: [IconButton(onPressed: _addReading, icon: const Icon(Icons.add_circle_outline_rounded))],
+        actions: [IconButton(onPressed: () => _addReading(), icon: const Icon(Icons.add_circle_outline_rounded))],
       ),
       body: AsyncView<List<HealthMetricModel>>(
         future: _future,
@@ -61,7 +62,7 @@ class _HealthStatusPageState extends State<HealthStatusPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const EmptyView(message: 'No health readings yet', icon: Icons.monitor_heart_outlined),
-                ElevatedButton(onPressed: _addReading, child: const Text('  Add your first reading  ')),
+                ElevatedButton(onPressed: () => _addReading(), child: const Text('  Add your first reading  ')),
               ],
             );
           }
@@ -132,7 +133,11 @@ class _HealthStatusPageState extends State<HealthStatusPage> {
                 onSelected: (v) => setState(() => _chart = v),
               ),
               const SizedBox(height: 12),
-              AppCard(child: SizedBox(height: 220, child: _weeklyChart(metrics.reversed.toList()))),
+              AppCard(child: SizedBox(height: 220, child: _weeklyChart(metrics.take(7).toList().reversed.toList()))),
+              const SectionHeader(title: 'Weekly Average'),
+              _weeklyAverage(metrics),
+              SectionHeader(title: 'My Readings', action: 'Add', onAction: () => _addReading()),
+              for (final r in metrics.take(14)) _readingTile(r),
               const SizedBox(height: 16),
               const DisclaimerCard(),
             ],
@@ -140,6 +145,115 @@ class _HealthStatusPageState extends State<HealthStatusPage> {
         },
       ),
     );
+  }
+
+  // hena bn7seb el motawaset beta3 a5er 7 ayam w el 7 ayam elly ablhom
+  Widget _weeklyAverage(List<HealthMetricModel> all) {
+    final now = DateTime.now();
+    final thisWeek = all.where((m) => now.difference(m.recordedAt).inDays < 7).toList();
+    final lastWeek = all.where((m) {
+      final d = now.difference(m.recordedAt).inDays;
+      return d >= 7 && d < 14;
+    }).toList();
+
+    // motawaset field wa7ed (bnshel el null)
+    double? avg(List<HealthMetricModel> list, num? Function(HealthMetricModel) pick) {
+      final values = list.map(pick).whereType<num>().toList();
+      if (values.isEmpty) return null;
+      return values.reduce((a, b) => a + b) / values.length;
+    }
+
+    final rows = <(String, IconData, num? Function(HealthMetricModel), String, int)>[
+      ('Blood Sugar', Icons.water_drop_rounded, (m) => m.bloodSugar, 'mg/dL', 0),
+      ('Heart Rate', Icons.favorite_rounded, (m) => m.heartRate, 'bpm', 0),
+      ('Weight', Icons.monitor_weight_rounded, (m) => m.weight, 'kg', 1),
+      ('Steps', Icons.directions_walk_rounded, (m) => m.steps, '', 0),
+      ('Sleep', Icons.bedtime_rounded, (m) => m.sleepHours, 'h', 1),
+    ];
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('This week (${thisWeek.length} readings) vs last week',
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12.5)),
+          const SizedBox(height: 8),
+          if (thisWeek.isEmpty)
+            const Text('No readings this week yet. Add one to see your average.')
+          else
+            for (final r in rows)
+              Builder(builder: (context) {
+                final current = avg(thisWeek, r.$3);
+                final previous = avg(lastWeek, r.$3);
+                if (current == null) return const SizedBox.shrink();
+                final diff = previous == null ? null : current - previous;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  child: Row(
+                    children: [
+                      Icon(r.$2, size: 20, color: AppColors.primary),
+                      const SizedBox(width: 10),
+                      Expanded(child: Text(r.$1)),
+                      Text('${current.toStringAsFixed(r.$5)} ${r.$4}',
+                          style: const TextStyle(fontWeight: FontWeight.w800)),
+                      const SizedBox(width: 8),
+                      // el sahm: atla3 aw nzl 3an el esboo3 elly fat
+                      if (diff != null && diff.abs() >= 0.05)
+                        Text('${diff > 0 ? '▲' : '▼'} ${diff.abs().toStringAsFixed(r.$5)}',
+                            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                    ],
+                  ),
+                );
+              }),
+        ],
+      ),
+    );
+  }
+
+  // row wa7ed f list el qeyasat (edit / delete)
+  Widget _readingTile(HealthMetricModel r) {
+    final parts = [
+      if (r.bloodSugar != null) 'Sugar ${r.bloodSugar}',
+      if (r.heartRate != null) 'HR ${r.heartRate}',
+      if (r.bloodPressure != null) 'BP ${r.bloodPressure}',
+      if (r.weight != null) '${r.weight} kg',
+    ];
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: AppCard(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        onTap: () => _addReading(r),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(formatDate(r.recordedAt), style: const TextStyle(fontWeight: FontWeight.w700)),
+                  Text(parts.isEmpty ? 'Activity only' : parts.join(' • '),
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12.5)),
+                ],
+              ),
+            ),
+            const Icon(Icons.edit_outlined, size: 20, color: AppColors.primary),
+            IconButton(
+              onPressed: () => _deleteReading(r),
+              icon: const Icon(Icons.delete_outline, color: AppColors.error),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _deleteReading(HealthMetricModel r) async {
+    if (!await confirmDialog(context, 'Delete reading', 'Delete the reading of ${formatDate(r.recordedAt)}?')) return;
+    try {
+      await MedicalService.deleteMetric(r.id);
+      _reload();
+    } catch (e) {
+      if (mounted) showSnack(context, friendlyError(e), error: true);
+    }
   }
 
   Widget _heartRing(HealthMetricModel m) {
@@ -264,7 +378,8 @@ class _HealthStatusPageState extends State<HealthStatusPage> {
 
 // form l-idafet qeyas se7y gedid
 class AddMetricSheet extends StatefulWidget {
-  const AddMetricSheet({super.key});
+  final HealthMetricModel? existing; // law mawgood bn3dl badal ma nzawed
+  const AddMetricSheet({super.key, this.existing});
 
   @override
   State<AddMetricSheet> createState() => _AddMetricSheetState();
@@ -288,6 +403,28 @@ class _AddMetricSheetState extends State<AddMetricSheet> {
     'calories_burned': 'Calories burned (kcal)',
     'sleep_hours': 'Sleep (hours)',
   };
+
+  @override
+  void initState() {
+    super.initState();
+    // law edit: bnmla el fields bel qeyam el adema
+    final e = widget.existing;
+    if (e != null) {
+      final old = <String, Object?>{
+        'heart_rate': e.heartRate,
+        'blood_pressure': e.bloodPressure,
+        'blood_sugar': e.bloodSugar,
+        'weight': e.weight,
+        'height': e.height,
+        'steps': e.steps,
+        'calories_burned': e.caloriesBurned,
+        'sleep_hours': e.sleepHours,
+      };
+      for (final k in _c.keys) {
+        _c[k]!.text = old[k]?.toString() ?? '';
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -324,7 +461,13 @@ class _AddMetricSheetState extends State<AddMetricSheet> {
     }
     setState(() => _saving = true);
     try {
-      await MedicalService.addMetric(values);
+      if (widget.existing != null) {
+        // fel edit bnb3t kol el fields (elly etms7et btb2a null)
+        final all = {for (final k in _c.keys) k: values[k]};
+        await MedicalService.updateMetric(widget.existing!.id, all);
+      } else {
+        await MedicalService.addMetric(values);
+      }
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
       if (mounted) showSnack(context, friendlyError(e), error: true);
@@ -342,7 +485,8 @@ class _AddMetricSheetState extends State<AddMetricSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Add Health Reading', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+            Text(widget.existing == null ? 'Add Health Reading' : 'Edit Reading',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
             const SizedBox(height: 12),
             for (final e in _c.entries) ...[
               TextField(

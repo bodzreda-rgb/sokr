@@ -178,6 +178,70 @@ class _RecordsListPageState extends State<RecordsListPage> {
     }
   }
 
+  // hena el user y3dl el record bta3o (title / type / description)
+  Future<void> _edit(MedicalRecordModel r) async {
+    final title = TextEditingController(text: r.title);
+    final desc = TextEditingController(text: r.description);
+    var type = r.recordType;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setLocal) => AlertDialog(
+          title: const Text('Edit record'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: title, decoration: const InputDecoration(labelText: 'Title')),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                initialValue: type,
+                items: [for (final t in MedicalRecordModel.types) DropdownMenuItem(value: t, child: Text(t))],
+                onChanged: (v) => setLocal(() => type = v ?? type),
+              ),
+              const SizedBox(height: 8),
+              TextField(controller: desc, maxLines: 3, decoration: const InputDecoration(labelText: 'Description')),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Save')),
+          ],
+        ),
+      ),
+    );
+    if (ok == true && title.text.trim().isNotEmpty) {
+      try {
+        await MedicalService.updateRecord(r.id, {
+          'title': title.text.trim(),
+          'description': desc.text.trim(),
+          'record_type': type,
+        });
+        // law el no3 et8ayar, el record yetna2el le category tanya
+        setState(() {
+          final i = _records.indexOf(r);
+          final updated = MedicalRecordModel(
+            id: r.id,
+            title: title.text.trim(),
+            description: desc.text.trim(),
+            filePath: r.filePath,
+            recordType: type,
+            createdAt: r.createdAt,
+          );
+          if (type == widget.type) {
+            _records[i] = updated;
+          } else {
+            _records.removeAt(i);
+          }
+        });
+        if (mounted) showSnack(context, 'Record updated');
+      } catch (e) {
+        if (mounted) showSnack(context, friendlyError(e), error: true);
+      }
+    }
+    title.dispose();
+    desc.dispose();
+  }
+
   Future<void> _delete(MedicalRecordModel r) async {
     if (!await confirmDialog(context, 'Delete record', 'Delete "${r.title}"?')) return;
     try {
@@ -228,6 +292,11 @@ class _RecordsListPageState extends State<RecordsListPage> {
                           onPressed: () => _view(r),
                           icon: const Icon(Icons.visibility_rounded, color: AppColors.primary),
                         ),
+                      IconButton(
+                        tooltip: 'Edit',
+                        onPressed: () => _edit(r),
+                        icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
+                      ),
                       IconButton(
                         tooltip: 'Delete',
                         onPressed: () => _delete(r),

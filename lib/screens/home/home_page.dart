@@ -10,6 +10,7 @@ import '../../services/medical_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/health_card.dart';
+import '../../widgets/promo_carousel.dart';
 import '../doctors/appointments_page.dart';
 import '../health_info/chat_bot_page.dart';
 import '../health_info/health_info_page.dart';
@@ -71,6 +72,13 @@ class _HomePageState extends State<HomePage> {
               children: [
                 _buildHeader(),
                 const SizedBox(height: 18),
+                // mesa7et el e3lanat (doctors / gyms / adwya)
+                const PromoCarousel(),
+                SectionHeader(
+                  title: 'Health Overview',
+                  action: 'Details',
+                  onAction: () => _open(const HealthStatusPage()),
+                ),
                 _buildHealthOverview(),
                 const SectionHeader(title: 'Upcoming Appointment'),
                 _buildUpcomingAppointment(),
@@ -143,71 +151,21 @@ class _HomePageState extends State<HomePage> {
 
         return Column(
           children: [
-            // card kbeer lel heart rate zay el sora
-            AppCard(
-              onTap: openStatus,
-              gradient: const LinearGradient(colors: [Colors.white, AppColors.pink]),
-              child: Row(
-                children: [
-                  const IconTile(icon: Icons.favorite_rounded, color: AppColors.error, size: 60),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Health Overview',
-                            style: TextStyle(fontWeight: FontWeight.w700)),
-                        const SizedBox(height: 4),
-                        const Text('Heart Rate', style: TextStyle(color: AppColors.textSecondary)),
-                        Text('${v(m?.heartRate)} bpm',
-                            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
-                      ],
-                    ),
-                  ),
-                  if (snapshot.hasError)
-                    const Icon(Icons.error_outline, color: AppColors.error)
-                  else
-                    const Icon(Icons.chevron_right_rounded),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            // 3 cards soghayara b LayoutBuilder 3shan ykono responsive
+            // 4 cards lel qeyasat (2 f kol saf) b LayoutBuilder 3shan ykono responsive
             LayoutBuilder(builder: (context, c) {
-              final w = (c.maxWidth - 24) / 3;
-              return Row(
+              final w = (c.maxWidth - 12) / 2;
+              Widget card(IconData icon, String title, String value, String unit, Color color) => SizedBox(
+                    width: w,
+                    child: HealthCard(icon: icon, title: title, value: value, unit: unit, color: color, onTap: openStatus),
+                  );
+              return Wrap(
+                spacing: 12,
+                runSpacing: 12,
                 children: [
-                  SizedBox(
-                    width: w,
-                    child: HealthCard(
-                        icon: Icons.bloodtype_rounded,
-                        title: 'Blood Pressure',
-                        value: v(m?.bloodPressure),
-                        unit: 'mmHg',
-                        onTap: openStatus),
-                  ),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: w,
-                    child: HealthCard(
-                        icon: Icons.water_drop_rounded,
-                        title: 'Blood Sugar',
-                        value: v(m?.bloodSugar),
-                        unit: 'mg/dL',
-                        color: const Color(0xFF7C8CF8),
-                        onTap: openStatus),
-                  ),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: w,
-                    child: HealthCard(
-                        icon: Icons.monitor_weight_rounded,
-                        title: 'Weight',
-                        value: v(m?.weight?.toStringAsFixed(0)),
-                        unit: 'kg',
-                        color: const Color(0xFFF08A5D),
-                        onTap: openStatus),
-                  ),
+                  card(Icons.favorite_rounded, 'Heart Rate', v(m?.heartRate), 'bpm', AppColors.error),
+                  card(Icons.bloodtype_rounded, 'Blood Pressure', v(m?.bloodPressure), 'mmHg', AppColors.primary),
+                  card(Icons.water_drop_rounded, 'Blood Sugar', v(m?.bloodSugar), 'mg/dL', const Color(0xFF7C8CF8)),
+                  card(Icons.monitor_weight_rounded, 'Weight', v(m?.weight?.toStringAsFixed(0)), 'kg', const Color(0xFFF08A5D)),
                 ],
               );
             }),

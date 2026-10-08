@@ -30,8 +30,9 @@ class UserModel {
       fullName.trim().isEmpty ? 'there' : fullName.trim().split(' ').first;
 }
 
-// el roles elly mawgoda f el app (patient = el user el 3adi, admin = by-edit kol 7aga)
+// el roles elly mawgoda f el app (patient = el user el 3adi, doctor = el doctor, admin = by-edit kol 7aga)
 class UserRoles {
   static const patient = 'patient';
+  static const doctor = 'doctor';
   static const admin = 'admin';
 }

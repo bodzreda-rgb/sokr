@@ -27,4 +27,34 @@ class FitnessService {
         .map((row) => ExerciseModel.fromMap(row['exercises'] as Map<String, dynamic>))
         .toList();
   }
+
+  // ---------------- gym plans + subscriptions ----------------
+
+  // bakat el eshterak beta3t gym mo3ayan
+  static Future<List<GymPlanModel>> getGymPlans(String gymId) async {
+    final data = await supabase
+        .from('gym_plans')
+        .select()
+        .eq('gym_id', gymId)
+        .order('duration_months');
+    return data.map(GymPlanModel.fromMap).toList();
+  }
+
+  // hena el patient by-subscribe (el RPC by7seb el se3r w el tarekh)
+  static Future<void> subscribe(String planId) async {
+    await supabase.rpc('subscribe_gym', params: {'p_plan': planId});
+  }
+
+  static Future<List<GymSubscriptionModel>> getMySubscriptions() async {
+    final data = await supabase
+        .from('gym_subscriptions')
+        .select('*, gyms(name)')
+        .eq('patient_id', currentUserId)
+        .order('created_at', ascending: false);
+    return data.map(GymSubscriptionModel.fromMap).toList();
+  }
+
+  static Future<void> cancelSubscription(String id) async {
+    await supabase.from('gym_subscriptions').update({'status': 'cancelled'}).eq('id', id);
+  }
 }

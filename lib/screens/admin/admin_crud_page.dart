@@ -1,6 +1,8 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../services/storage_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -10,7 +12,7 @@ import '../../widgets/common_widgets.dart';
 // ======================================================
 
 // anwa3 el fields elly el form y2dar y3rdha
-enum FieldType { text, multiline, integer, decimal, boolean, choice, weekday, reference, date, time }
+enum FieldType { text, multiline, integer, decimal, boolean, choice, weekday, reference, date, time, image }
 
 // field wa7ed f el form
 class AdminField {
@@ -219,6 +221,7 @@ class _AdminFormPageState extends State<AdminFormPage> {
 
   static const _textTypes = {
     FieldType.text, FieldType.multiline, FieldType.integer, FieldType.decimal, FieldType.date, FieldType.time,
+    FieldType.image,
   };
 
   @override
@@ -292,10 +295,58 @@ class _AdminFormPageState extends State<AdminFormPage> {
     return null;
   }
 
+  // hena el admin by5tar sora men el gehaz w nrf3ha 3la Supabase Storage
+  Future<void> _uploadImage(AdminField f) async {
+    try {
+      final file = await FilePicker.pickFile(type: FileType.image);
+      if (file == null) return;
+      setState(() => _saving = true);
+      final url = await StorageService.uploadImage(await file.readAsBytes(), file.name, widget.config.table);
+      setState(() => _text[f.key]!.text = url);
+      if (mounted) showSnack(context, 'Photo uploaded');
+    } catch (e) {
+      if (mounted) showSnack(context, friendlyError(e), error: true);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
   // da widget wa7ed le kol field 3la 7asab el no3
   Widget _buildField(AdminField f) {
     final label = f.required ? '${f.label} *' : f.label;
     switch (f.type) {
+      case FieldType.image:
+        final url = _text[f.key]!.text;
+        return Row(
+          children: [
+            NetworkImageBox(url: url.isEmpty ? null : url, fallbackIcon: Icons.image_outlined, height: 72, width: 72),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(f.label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: _saving ? null : () => _uploadImage(f),
+                        icon: const Icon(Icons.upload_rounded, size: 18),
+                        label: Text(url.isEmpty ? 'Upload photo' : 'Change'),
+                      ),
+                      if (url.isNotEmpty)
+                        TextButton(
+                          onPressed: () => setState(() => _text[f.key]!.clear()),
+                          child: const Text('Remove', style: TextStyle(color: AppColors.error)),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
       case FieldType.boolean:
         return SwitchListTile(
           contentPadding: EdgeInsets.zero,
@@ -313,11 +364,15 @@ class _AdminFormPageState extends State<AdminFormPage> {
           _ => [for (final o in f.options) (o, o)],
         };
         final current = options.any((o) => o.$1 == _values[f.key]) ? _values[f.key] : null;
-        return DropdownButtonFormField<Object>(
+        return DropdownButtonFormField<Object?>(
           initialValue: current,
           isExpanded: true,
           decoration: InputDecoration(labelText: label),
-          items: [for (final o in options) DropdownMenuItem(value: o.$1, child: Text(o.$2, overflow: TextOverflow.ellipsis))],
+          items: [
+            // lw el field msh required, el admin y2dar y5tar "None"
+            if (!f.required) const DropdownMenuItem<Object?>(value: null, child: Text('- None -')),
+            for (final o in options) DropdownMenuItem<Object?>(value: o.$1, child: Text(o.$2, overflow: TextOverflow.ellipsis)),
+          ],
           onChanged: (v) => setState(() => _values[f.key] = v),
           validator: (v) => (f.required && v == null) ? 'Required' : null,
         );

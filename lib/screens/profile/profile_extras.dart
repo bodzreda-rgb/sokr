@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../models/appointment_model.dart';
+import '../../models/gym_model.dart';
 import '../../models/order_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/doctor_service.dart';
@@ -292,6 +293,99 @@ class SettingsPage extends StatelessWidget {
           const SizedBox(height: 12),
           const DisclaimerCard(),
         ],
+      ),
+    );
+  }
+}
+
+// ======================== Gym Subscriptions ========================
+// el patient byshof eshterakato f el gyms w y2dar y-cancel
+class MySubscriptionsPage extends StatefulWidget {
+  const MySubscriptionsPage({super.key});
+
+  @override
+  State<MySubscriptionsPage> createState() => _MySubscriptionsPageState();
+}
+
+class _MySubscriptionsPageState extends State<MySubscriptionsPage> {
+  late Future<List<GymSubscriptionModel>> _future = FitnessService.getMySubscriptions();
+
+  void _reload() => setState(() => _future = FitnessService.getMySubscriptions());
+
+  Future<void> _cancel(GymSubscriptionModel s) async {
+    if (!await confirmDialog(context, 'Cancel subscription', 'Cancel ${s.planName} at ${s.gymName}?')) return;
+    try {
+      await FitnessService.cancelSubscription(s.id);
+      _reload();
+    } catch (e) {
+      if (mounted) showSnack(context, friendlyError(e), error: true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Gym Subscriptions')),
+      body: AsyncView<List<GymSubscriptionModel>>(
+        future: _future,
+        onRetry: _reload,
+        builder: (list) {
+          if (list.isEmpty) {
+            return const EmptyView(
+              message: 'No subscriptions yet.\nOpen a gym from Exercises > Gyms to subscribe.',
+              icon: Icons.card_membership_rounded,
+            );
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.all(20),
+            itemCount: list.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 12),
+            itemBuilder: (context, i) {
+              final s = list[i];
+              final status = s.status == 'active' && !s.isActive ? 'expired' : s.status;
+              return AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const IconTile(icon: Icons.fitness_center_rounded),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(s.gymName, style: const TextStyle(fontWeight: FontWeight.w700)),
+                              Text('${s.planName} • ${money(s.price)}',
+                                  style: const TextStyle(color: AppColors.textSecondary)),
+                            ],
+                          ),
+                        ),
+                        StatusBadge(
+                          text: prettyStatus(status),
+                          color: status == 'active' ? AppColors.success : AppColors.error,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    InfoLine(
+                      icon: Icons.date_range_rounded,
+                      text: '${formatDate(s.startDate)}  →  ${formatDate(s.endDate)}',
+                    ),
+                    if (status == 'active')
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () => _cancel(s),
+                          child: const Text('Cancel', style: TextStyle(color: AppColors.error)),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }

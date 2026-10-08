@@ -6,6 +6,7 @@ import '../../models/gym_model.dart';
 import '../../services/fitness_service.dart';
 import '../../services/location_service.dart';
 import '../../services/medical_service.dart';
+import '../../services/supabase_service.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/exercise_card.dart';
 import '../../widgets/gym_card.dart';
@@ -80,6 +81,7 @@ class GymDetailsPage extends StatefulWidget {
 
 class _GymDetailsPageState extends State<GymDetailsPage> {
   late Future<List<ExerciseModel>> _future;
+  late final Future<List<GymPlanModel>> _plans = FitnessService.getGymPlans(widget.gym.id);
   bool _isFavorite = false;
 
   @override
@@ -97,6 +99,28 @@ class _GymDetailsPageState extends State<GymDetailsPage> {
       if (mounted) setState(() => _isFavorite = v);
     } catch (_) {
       if (mounted) showSnack(context, 'Could not update favorites', error: true);
+    }
+  }
+
+  // hena el patient by-subscribe f el gym (pay at the gym, msh online)
+  Future<void> _subscribe(GymPlanModel p) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Subscribe to ${widget.gym.name}'),
+        content: Text('${p.name} plan for ${money(p.price)}. You will pay at the gym reception.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Confirm')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await FitnessService.subscribe(p.id);
+      if (mounted) showSnack(context, 'Subscribed! See it in Profile > Gym Subscriptions');
+    } catch (e) {
+      if (mounted) showSnack(context, friendlyError(e), error: true);
     }
   }
 
@@ -130,6 +154,46 @@ class _GymDetailsPageState extends State<GymDetailsPage> {
           const SizedBox(height: 10),
           InfoLine(icon: Icons.location_on_rounded, text: g.address),
           if (g.phone != null) InfoLine(icon: Icons.phone_rounded, text: g.phone!),
+          // bakat el eshterak (el as3ar el admin by7otha)
+          const SectionHeader(title: 'Membership Plans'),
+          AsyncView<List<GymPlanModel>>(
+            future: _plans,
+            builder: (plans) {
+              if (plans.isEmpty) return const Text('No plans yet', style: TextStyle(color: AppColors.textSecondary));
+              return Column(
+                children: [
+                  for (final p in plans)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: AppCard(
+                        child: Row(
+                          children: [
+                            const IconTile(icon: Icons.card_membership_rounded, size: 42),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(p.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+                                  Text(p.description, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12.5)),
+                                  Text(money(p.price),
+                                      style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.primary)),
+                                ],
+                              ),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(minimumSize: const Size(0, 40)),
+                              onPressed: () => _subscribe(p),
+                              child: const Text('Subscribe'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           const SectionHeader(title: 'Exercises in this gym'),
           AsyncView<List<ExerciseModel>>(
             future: _future,

@@ -15,7 +15,7 @@ const _common = [
   AdminField('description', 'Description', type: FieldType.multiline),
   AdminField('address', 'Address'),
   AdminField('phone', 'Phone'),
-  AdminField('image_url', 'Image URL'),
+  AdminField('image_url', 'Photo', type: FieldType.image),
   AdminField('rating', 'Rating (0 - 5)', type: FieldType.decimal),
   AdminField('latitude', 'Latitude', type: FieldType.decimal),
   AdminField('longitude', 'Longitude', type: FieldType.decimal),
@@ -29,6 +29,9 @@ const doctorsTable = AdminTable(
   subtitleKeys: ['specialization', 'clinic_name'],
   fields: [
     AdminField('full_name', 'Full name', required: true),
+    // lw et5tar account, el user da byb2a doctor w y2dar y3ml login lel Doctor Portal
+    AdminField('profile_id', 'Linked login account (optional)', type: FieldType.reference,
+        refTable: 'profiles', refLabel: 'email'),
     AdminField('specialization', 'Specialization', type: FieldType.choice, options: DoctorModel.specializations, required: true),
     AdminField('bio', 'Bio', type: FieldType.multiline),
     AdminField('years_experience', 'Years of experience', type: FieldType.integer),
@@ -36,7 +39,7 @@ const doctorsTable = AdminTable(
     AdminField('clinic_name', 'Clinic name'),
     AdminField('clinic_address', 'Clinic address'),
     AdminField('phone', 'Phone'),
-    AdminField('avatar_url', 'Photo URL'),
+    AdminField('avatar_url', 'Photo', type: FieldType.image),
     AdminField('rating', 'Rating (0 - 5)', type: FieldType.decimal),
     AdminField('latitude', 'Latitude', type: FieldType.decimal),
     AdminField('longitude', 'Longitude', type: FieldType.decimal),
@@ -114,7 +117,7 @@ const medicinesTable = AdminTable(
     AdminField('description', 'Description', type: FieldType.multiline),
     AdminField('price', 'Price (EGP)', type: FieldType.decimal, required: true),
     AdminField('stock_quantity', 'Stock quantity', type: FieldType.integer, required: true),
-    AdminField('image_url', 'Image URL'),
+    AdminField('image_url', 'Photo', type: FieldType.image),
     AdminField('prescription_required', 'Prescription required', type: FieldType.boolean),
   ],
 );
@@ -132,7 +135,7 @@ const exercisesTable = AdminTable(
     AdminField('description', 'Description', type: FieldType.multiline),
     AdminField('duration_minutes', 'Duration (minutes)', type: FieldType.integer, required: true),
     AdminField('calories', 'Calories', type: FieldType.integer, required: true),
-    AdminField('image_url', 'Image URL'),
+    AdminField('image_url', 'Photo', type: FieldType.image),
     AdminField('video_url', 'Video URL'),
   ],
 );
@@ -185,7 +188,7 @@ const foodTable = AdminTable(
     AdminField('protein', 'Protein (g)', type: FieldType.integer),
     AdminField('carbs', 'Carbs (g)', type: FieldType.integer),
     AdminField('fats', 'Fats (g)', type: FieldType.integer),
-    AdminField('image_url', 'Image URL'),
+    AdminField('image_url', 'Photo', type: FieldType.image),
     AdminField('is_healthy', 'Healthy', type: FieldType.boolean),
   ],
 );
@@ -203,7 +206,56 @@ const usersTable = AdminTable(
   fields: [
     AdminField('full_name', 'Full name', required: true),
     AdminField('phone', 'Phone'),
-    AdminField('role', 'Role', type: FieldType.choice, options: ['patient', 'admin'], required: true),
+    AdminField('role', 'Role', type: FieldType.choice, options: ['patient', 'doctor', 'admin'], required: true),
+  ],
+);
+
+// as3ar eshterakat el gyms (el admin y8yrha)
+const gymPlansTable = AdminTable(
+  table: 'gym_plans',
+  title: 'Gym Prices',
+  icon: Icons.price_change_rounded,
+  titleKey: 'gym_id',
+  subtitleKeys: ['name', 'price'],
+  orderBy: 'gym_id',
+  fields: [
+    AdminField('gym_id', 'Gym', type: FieldType.reference, refTable: 'gyms', required: true),
+    AdminField('name', 'Plan name (e.g. Monthly)', required: true),
+    AdminField('duration_months', 'Duration (months)', type: FieldType.integer, required: true),
+    AdminField('price', 'Price (EGP)', type: FieldType.decimal, required: true),
+    AdminField('description', 'Description', type: FieldType.multiline),
+  ],
+);
+
+const gymSubscriptionsTable = AdminTable(
+  table: 'gym_subscriptions',
+  title: 'Gym Subscriptions',
+  icon: Icons.card_membership_rounded,
+  titleKey: 'patient_id',
+  subtitleKeys: ['gym_id', 'plan_name', 'status'],
+  fields: [
+    AdminField('patient_id', 'Patient', type: FieldType.reference, refTable: 'profiles', refLabel: 'full_name', required: true),
+    AdminField('gym_id', 'Gym', type: FieldType.reference, refTable: 'gyms', required: true),
+    AdminField('plan_name', 'Plan', required: true),
+    AdminField('price', 'Price (EGP)', type: FieldType.decimal, required: true),
+    AdminField('start_date', 'Start date', type: FieldType.date, required: true),
+    AdminField('end_date', 'End date', type: FieldType.date, required: true),
+    AdminField('status', 'Status', type: FieldType.choice,
+        options: ['pending', 'active', 'cancelled', 'expired'], required: true),
+  ],
+);
+
+const dietPlansTable = AdminTable(
+  table: 'diet_plans',
+  title: 'Diet Plans',
+  icon: Icons.restaurant_menu_rounded,
+  titleKey: 'title',
+  subtitleKeys: ['patient_id', 'doctor_id'],
+  fields: [
+    AdminField('patient_id', 'Patient', type: FieldType.reference, refTable: 'profiles', refLabel: 'full_name', required: true),
+    AdminField('doctor_id', 'Doctor', type: FieldType.reference, refTable: 'doctors', refLabel: 'full_name', required: true),
+    AdminField('title', 'Title', required: true),
+    AdminField('notes', 'Notes', type: FieldType.multiline),
   ],
 );
 
@@ -218,8 +270,11 @@ const allAdminTables = [
   exercisesTable,
   gymsTable,
   gymExercisesTable,
+  gymPlansTable,
+  gymSubscriptionsTable,
   restaurantsTable,
   foodTable,
+  dietPlansTable,
   usersTable,
 ];
 

@@ -33,8 +33,14 @@ class AuthService {
         'phone': (phone ?? '').trim().isEmpty ? null : phone!.trim(),
       },
     );
-    // law email confirmation shaghal, el session btb2a null le7d ma y-confirm
-    return res.session != null;
+    if (res.session != null) return true;
+    // law mafish session (masalan email confirmation shaghal), bngarrab login 3la tool
+    try {
+      await signIn(email, password);
+      return true;
+    } catch (_) {
+      return false; // lazem el user y-confirm el email el awel
+    }
   }
 
   // da el login function beta3t el user

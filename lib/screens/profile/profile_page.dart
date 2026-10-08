@@ -5,6 +5,7 @@ import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/common_widgets.dart';
 import '../doctors/appointments_page.dart';
+import '../food/diet_plan_page.dart';
 import '../medical/medical_records_page.dart';
 import '../pharmacy/orders_page.dart';
 import 'profile_extras.dart';
@@ -43,6 +44,8 @@ class ProfilePage extends StatelessWidget {
             ProfileOption(icon: Icons.folder_shared_rounded, title: 'Medical Records', onTap: () => _open(context, const MedicalRecordsPage())),
             ProfileOption(icon: Icons.event_note_rounded, title: 'Appointments', onTap: () => _open(context, const AppointmentsPage())),
             ProfileOption(icon: Icons.receipt_long_rounded, title: 'Orders', onTap: () => _open(context, const MyOrdersPage())),
+            ProfileOption(icon: Icons.restaurant_menu_rounded, title: 'My Diet Plan', onTap: () => _open(context, const MyDietPlanPage())),
+            ProfileOption(icon: Icons.card_membership_rounded, title: 'Gym Subscriptions', onTap: () => _open(context, const MySubscriptionsPage())),
             ProfileOption(icon: Icons.favorite_rounded, title: 'Favorites', onTap: () => _open(context, const FavoritesPage())),
             ProfileOption(icon: Icons.notifications_rounded, title: 'Notifications', onTap: () => _open(context, const NotificationsPage())),
             ProfileOption(icon: Icons.settings_rounded, title: 'Settings', onTap: () => _open(context, const SettingsPage())),
