@@ -3,7 +3,6 @@ import 'model_helpers.dart';
 // da el model beta3 el saydaleya
 class PharmacyModel {
   final String id;
-  final String? ownerId;
   final String name;
   final String description;
   final String address;
@@ -16,7 +15,6 @@ class PharmacyModel {
 
   const PharmacyModel({
     required this.id,
-    this.ownerId,
     required this.name,
     required this.description,
     required this.address,
@@ -30,7 +28,6 @@ class PharmacyModel {
 
   factory PharmacyModel.fromMap(Map<String, dynamic> map) => PharmacyModel(
         id: map['id'] as String,
-        ownerId: map['owner_id'] as String?,
         name: (map['name'] ?? '') as String,
         description: (map['description'] ?? '') as String,
         address: (map['address'] ?? '') as String,

@@ -31,7 +31,6 @@ class AppointmentModel {
 
   factory AppointmentModel.fromMap(Map<String, dynamic> map) {
     final doctor = asMap(map['doctors']);
-    final doctorProfile = asMap(doctor['profiles']);
     final patient = asMap(map['profiles']);
     return AppointmentModel(
       id: map['id'] as String,
@@ -41,7 +40,7 @@ class AppointmentModel {
       time: (map['appointment_time'] ?? '') as String,
       status: (map['status'] ?? 'pending') as String,
       notes: map['notes'] as String?,
-      doctorName: (doctorProfile['full_name'] ?? '') as String,
+      doctorName: (doctor['full_name'] ?? '') as String,
       specialization: (doctor['specialization'] ?? '') as String,
       patientName: (patient['full_name'] ?? 'Patient') as String,
       patientPhone: patient['phone'] as String?,

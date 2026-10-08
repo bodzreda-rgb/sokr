@@ -11,7 +11,6 @@ class ExerciseModel {
   final int calories;
   final String? imageUrl;
   final String? videoUrl;
-  final String? createdBy;
 
   const ExerciseModel({
     this.id = '',
@@ -23,7 +22,6 @@ class ExerciseModel {
     required this.calories,
     this.imageUrl,
     this.videoUrl,
-    this.createdBy,
   });
 
   factory ExerciseModel.fromMap(Map<String, dynamic> map) => ExerciseModel(
@@ -36,7 +34,6 @@ class ExerciseModel {
         calories: toInt(map['calories']),
         imageUrl: map['image_url'] as String?,
         videoUrl: map['video_url'] as String?,
-        createdBy: map['created_by'] as String?,
       );
 
   Map<String, dynamic> toMap() => {

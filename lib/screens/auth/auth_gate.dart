@@ -4,15 +4,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/common_widgets.dart';
-import '../dashboards/doctor_dashboard.dart';
-import '../dashboards/gym_dashboard.dart';
-import '../dashboards/pharmacy_dashboard.dart';
-import '../dashboards/restaurant_dashboard.dart';
+import '../admin/admin_dashboard.dart';
 import '../shell/main_shell.dart';
 import 'login_page.dart';
 
 // da el "bawab": by-listen 3la el auth state
-// law mafish session -> Login, law fe -> bngeb el role w nwadih el dashboard el sa7
+// law mafish session -> Login, law fe -> bngeb el role (admin aw patient)
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
@@ -54,13 +51,8 @@ class _RoleRouterState extends State<RoleRouter> {
       body: AsyncView<UserModel>(
         future: _future,
         onRetry: () => setState(() => _future = AuthService.instance.loadProfile()),
-        builder: (user) => switch (user.role) {
-          UserRoles.doctor => const DoctorDashboard(),
-          UserRoles.pharmacist => const PharmacyDashboard(),
-          UserRoles.gym => const GymDashboard(),
-          UserRoles.restaurant => const RestaurantDashboard(),
-          _ => const MainShell(),
-        },
+        // el admin yro7 el admin dashboard, w el patient yro7 el app el 3adi
+        builder: (user) => user.role == UserRoles.admin ? const AdminDashboard() : const MainShell(),
       ),
     );
   }

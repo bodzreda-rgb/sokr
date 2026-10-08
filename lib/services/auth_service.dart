@@ -17,14 +17,13 @@ class AuthService {
 
   Session? get session => supabase.auth.currentSession;
 
-  // da el signup: el role w el esm byt5zno f metadata,
-  // w el trigger f el database bey3ml el profile automatic
+  // da el signup: el esm w el phone byt5zno f metadata,
+  // w el trigger f el database bey3ml el profile automatic (dayman patient)
   Future<bool> signUp({
     required String fullName,
     required String email,
     required String password,
     String? phone,
-    required String role,
   }) async {
     final res = await supabase.auth.signUp(
       email: email.trim(),
@@ -32,7 +31,6 @@ class AuthService {
       data: {
         'full_name': fullName.trim(),
         'phone': (phone ?? '').trim().isEmpty ? null : phone!.trim(),
-        'role': role,
       },
     );
     // law email confirmation shaghal, el session btb2a null le7d ma y-confirm

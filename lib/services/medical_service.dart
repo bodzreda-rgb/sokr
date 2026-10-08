@@ -140,12 +140,10 @@ class MedicalService {
       if (ids.isEmpty) continue;
       final rows = await supabase
           .from(entry.value)
-          .select(entry.key == 'doctor' ? 'id, profiles(full_name)' : 'id, name')
+          .select(entry.key == 'doctor' ? 'id, full_name' : 'id, name')
           .inFilter('id', ids);
       for (final row in rows) {
-        final name = entry.key == 'doctor'
-            ? ((row['profiles'] as Map?)?['full_name'] ?? 'Doctor') as String
-            : (row['name'] ?? '') as String;
+        final name = (row[entry.key == 'doctor' ? 'full_name' : 'name'] ?? '') as String;
         result.add((type: entry.key, id: row['id'] as String, name: name));
       }
     }

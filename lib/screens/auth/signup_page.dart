@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/common_widgets.dart';
 
-// da el Sign Up screen: el user y5tar el role bta3o
+// da el Sign Up screen (kol account gedid byb2a patient)
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -21,7 +20,6 @@ class _SignUpPageState extends State<SignUpPage> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
-  String _role = UserRoles.patient;
   bool _hidePassword = true;
   bool _loading = false;
 
@@ -45,7 +43,6 @@ class _SignUpPageState extends State<SignUpPage> {
         email: _emailController.text,
         password: _passwordController.text,
         phone: _phoneController.text,
-        role: _role,
       );
       if (!mounted) return;
       if (loggedIn) {
@@ -111,17 +108,6 @@ class _SignUpPageState extends State<SignUpPage> {
                         keyboardType: TextInputType.phone,
                         decoration: const InputDecoration(
                             hintText: 'Phone (optional)', prefixIcon: Icon(Icons.phone_outlined)),
-                      ),
-                      const SizedBox(height: 14),
-                      // hena el user by5tar el role bta3o
-                      DropdownButtonFormField<String>(
-                        initialValue: _role,
-                        decoration: const InputDecoration(
-                            prefixIcon: Icon(Icons.badge_outlined)),
-                        items: UserRoles.labels.entries
-                            .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-                            .toList(),
-                        onChanged: (v) => setState(() => _role = v ?? UserRoles.patient),
                       ),
                       const SizedBox(height: 14),
                       TextFormField(

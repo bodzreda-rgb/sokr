@@ -102,7 +102,6 @@ class PrescriptionModel {
 
   factory PrescriptionModel.fromMap(Map<String, dynamic> map) {
     final doctor = asMap(map['doctors']);
-    final doctorProfile = asMap(doctor['profiles']);
     final patient = asMap(map['profiles']);
     return PrescriptionModel(
       id: map['id'] as String,
@@ -110,7 +109,7 @@ class PrescriptionModel {
       medicineName: (map['medicine_name'] ?? '') as String,
       dosage: (map['dosage'] ?? '') as String,
       instructions: (map['instructions'] ?? '') as String,
-      doctorName: (doctorProfile['full_name'] ?? '') as String,
+      doctorName: (doctor['full_name'] ?? '') as String,
       patientName: (patient['full_name'] ?? '') as String,
       createdAt: toDate(map['created_at']),
     );

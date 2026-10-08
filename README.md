@@ -1,7 +1,7 @@
-# Healthcare App (Flutter + Supabase)
+# SOKR - سكر (Flutter + Supabase)
 
 Graduation project: healthcare platform (doctors, appointments, pharmacies, medicines,
-exercises, gyms, healthy food, medical records, health status) with 5 roles.
+exercises, gyms, healthy food, medical records, health status) with patient + admin roles.
 
 ## Setup
 
@@ -26,16 +26,12 @@ Or without editing the file:
 flutter run --dart-define=SUPABASE_URL=https://xxxx.supabase.co --dart-define=SUPABASE_ANON_KEY=xxxx
 ```
 
-## Demo accounts (password for all: `Demo@1234`)
+## Demo accounts (password: `Demo@1234`)
 
 | Role | Email |
 |------|-------|
 | Patient | patient@demo.com |
-| Doctor (Dr. Sarah Johnson) | sarah@demo.com |
-| Doctors | michael@demo.com, emily@demo.com, james@demo.com, olivia@demo.com |
-| Pharmacist | pharmacist@demo.com |
-| Gym | gym@demo.com |
-| Restaurant | restaurant@demo.com |
+| Admin (add / edit / delete everything) | admin@demo.com |
 
 ## Structure
 

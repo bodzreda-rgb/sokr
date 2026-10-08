@@ -4,6 +4,8 @@
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location to show nearby doctors, pharmacies, gyms and restaurants.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The camera is used for the Eye Check screen.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Select medical record files to upload.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>

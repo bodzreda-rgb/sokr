@@ -30,20 +30,8 @@ class UserModel {
       fullName.trim().isEmpty ? 'there' : fullName.trim().split(' ').first;
 }
 
-// el roles elly mawgoda f el app (nafs el values elly f el database)
+// el roles elly mawgoda f el app (patient = el user el 3adi, admin = by-edit kol 7aga)
 class UserRoles {
   static const patient = 'patient';
-  static const doctor = 'doctor';
-  static const pharmacist = 'pharmacist';
-  static const gym = 'gym';
-  static const restaurant = 'restaurant';
-
-  // esm kol role elly byzhar lel user f el signup
-  static const labels = {
-    patient: 'Patient / User',
-    doctor: 'Doctor',
-    pharmacist: 'Pharmacist',
-    gym: 'Gym / Fitness Provider',
-    restaurant: 'Restaurant Owner',
-  };
+  static const admin = 'admin';
 }

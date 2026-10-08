@@ -24,20 +24,6 @@ class PharmacyService {
     return data.map(PharmacyModel.fromMap).toList();
   }
 
-  // el saydaleya elly el pharmacist el 7ali byemlokha
-  static Future<PharmacyModel?> getMyPharmacy() async {
-    final data = await supabase
-        .from('pharmacies')
-        .select()
-        .eq('owner_id', currentUserId)
-        .limit(1);
-    return data.isEmpty ? null : PharmacyModel.fromMap(data.first);
-  }
-
-  static Future<void> updatePharmacy(String id, Map<String, dynamic> values) async {
-    await supabase.from('pharmacies').update(values).eq('id', id);
-  }
-
   // hena bngeb el adwya beta3t saydaleya mo3ayana
   static Future<List<MedicineModel>> getMedicines(String pharmacyId) async {
     final data = await supabase
@@ -46,19 +32,6 @@ class PharmacyService {
         .eq('pharmacy_id', pharmacyId)
         .order('name');
     return data.map(MedicineModel.fromMap).toList();
-  }
-
-  // add / edit / delete medicine (RLS by-check en el pharmacist sa7eb el saydaleya)
-  static Future<void> addMedicine(MedicineModel medicine) async {
-    await supabase.from('medicines').insert(medicine.toMap());
-  }
-
-  static Future<void> updateMedicine(String id, Map<String, dynamic> values) async {
-    await supabase.from('medicines').update(values).eq('id', id);
-  }
-
-  static Future<void> deleteMedicine(String id) async {
-    await supabase.from('medicines').delete().eq('id', id);
   }
 
   // hena bn3ml el order: el RPC by7seb el total w y2ales el stock f el database
@@ -86,12 +59,11 @@ class PharmacyService {
     return data.map(_toOrder).toList();
   }
 
-  // el orders elly gat lel saydaleya
-  static Future<List<OrderModel>> getPharmacyOrders(String pharmacyId) async {
+  // el admin byshof kol el orders
+  static Future<List<OrderModel>> getAllOrders() async {
     final data = await supabase
         .from('medicine_orders')
         .select(_orderSelect)
-        .eq('pharmacy_id', pharmacyId)
         .order('created_at', ascending: false);
     return data.map(_toOrder).toList();
   }

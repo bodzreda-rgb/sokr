@@ -1,9 +1,8 @@
 import 'model_helpers.dart';
 
-// da el model beta3 el doctor (doctors + el profile bta3o)
+// da el model beta3 el doctor (men table doctors)
 class DoctorModel {
   final String id;
-  final String profileId;
   final String name;
   final String? avatarUrl;
   final String? phone;
@@ -20,7 +19,6 @@ class DoctorModel {
 
   const DoctorModel({
     required this.id,
-    required this.profileId,
     required this.name,
     this.avatarUrl,
     this.phone,
@@ -36,15 +34,13 @@ class DoctorModel {
     required this.isAvailable,
   });
 
-  // el query bt-join el profiles: select('*, profiles(full_name, avatar_url, phone)')
+  // el doctor data 3adeya f table doctors (el admin howa elly byd5lha)
   factory DoctorModel.fromMap(Map<String, dynamic> map) {
-    final profile = asMap(map['profiles']);
     return DoctorModel(
       id: map['id'] as String,
-      profileId: map['profile_id'] as String,
-      name: (profile['full_name'] ?? 'Doctor') as String,
-      avatarUrl: profile['avatar_url'] as String?,
-      phone: profile['phone'] as String?,
+      name: (map['full_name'] ?? 'Doctor') as String,
+      avatarUrl: map['avatar_url'] as String?,
+      phone: map['phone'] as String?,
       specialization: (map['specialization'] ?? '') as String,
       bio: (map['bio'] ?? '') as String,
       yearsExperience: toInt(map['years_experience']),
@@ -65,6 +61,7 @@ class DoctorModel {
     'Dentist',
     'Orthopedic',
     'Endocrinologist',
+    'Ophthalmologist',
     'Dermatologist',
     'Pediatrician',
     'General Practitioner',

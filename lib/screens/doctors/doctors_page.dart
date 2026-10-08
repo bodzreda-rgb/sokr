@@ -10,7 +10,9 @@ import 'doctor_details_page.dart';
 
 // da el "Find Doctors" screen: search + filter + list
 class DoctorsPage extends StatefulWidget {
-  const DoctorsPage({super.key});
+  // law 3ayzeen nfta7 el page 3la specialization mo3ayan (masalan Ophthalmologist)
+  final String initialSpecialization;
+  const DoctorsPage({super.key, this.initialSpecialization = 'All'});
 
   @override
   State<DoctorsPage> createState() => _DoctorsPageState();
@@ -19,7 +21,7 @@ class DoctorsPage extends StatefulWidget {
 class _DoctorsPageState extends State<DoctorsPage> {
   late Future<List<DoctorModel>> _future;
   String _query = '';
-  String _specialization = 'All';
+  late String _specialization = widget.initialSpecialization;
   String _sort = 'Rating';
   bool _onlyAvailable = false;
 

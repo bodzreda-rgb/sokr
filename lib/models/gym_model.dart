@@ -3,7 +3,6 @@ import 'model_helpers.dart';
 // da el model beta3 el gym / fitness club
 class GymModel {
   final String id;
-  final String? ownerId;
   final String name;
   final String description;
   final String address;
@@ -15,7 +14,6 @@ class GymModel {
 
   const GymModel({
     required this.id,
-    this.ownerId,
     required this.name,
     required this.description,
     required this.address,
@@ -28,7 +26,6 @@ class GymModel {
 
   factory GymModel.fromMap(Map<String, dynamic> map) => GymModel(
         id: map['id'] as String,
-        ownerId: map['owner_id'] as String?,
         name: (map['name'] ?? '') as String,
         description: (map['description'] ?? '') as String,
         address: (map['address'] ?? '') as String,

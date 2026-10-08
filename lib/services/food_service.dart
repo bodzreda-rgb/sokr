@@ -29,19 +29,6 @@ class FoodService {
     return data == null ? null : RestaurantModel.fromMap(data);
   }
 
-  static Future<RestaurantModel?> getMyRestaurant() async {
-    final data = await supabase
-        .from('restaurants')
-        .select()
-        .eq('owner_id', currentUserId)
-        .limit(1);
-    return data.isEmpty ? null : RestaurantModel.fromMap(data.first);
-  }
-
-  static Future<void> updateRestaurant(String id, Map<String, dynamic> values) async {
-    await supabase.from('restaurants').update(values).eq('id', id);
-  }
-
   // el menu beta3 mat3am mo3ayan
   static Future<List<FoodModel>> getMenu(String restaurantId) async {
     final data = await supabase
@@ -60,18 +47,6 @@ class FoodService {
         .eq('is_healthy', true)
         .order('calories');
     return data.map(FoodModel.fromMap).toList();
-  }
-
-  static Future<void> addFood(FoodModel food) async {
-    await supabase.from('food_items').insert(food.toMap());
-  }
-
-  static Future<void> updateFood(String id, Map<String, dynamic> values) async {
-    await supabase.from('food_items').update(values).eq('id', id);
-  }
-
-  static Future<void> deleteFood(String id) async {
-    await supabase.from('food_items').delete().eq('id', id);
   }
 
   // order simulation (men 8er payment) - el total byt7seb f el database
@@ -98,11 +73,11 @@ class FoodService {
     return data.map(_toOrder).toList();
   }
 
-  static Future<List<OrderModel>> getRestaurantOrders(String restaurantId) async {
+  // el admin byshof kol el orders
+  static Future<List<OrderModel>> getAllOrders() async {
     final data = await supabase
         .from('food_orders')
         .select(_orderSelect)
-        .eq('restaurant_id', restaurantId)
         .order('created_at', ascending: false);
     return data.map(_toOrder).toList();
   }

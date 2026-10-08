@@ -12,6 +12,7 @@ import '../../widgets/common_widgets.dart';
 import '../../widgets/health_card.dart';
 import '../doctors/appointments_page.dart';
 import '../health_info/health_info_page.dart';
+import '../medical/eye_check_page.dart';
 import '../medical/health_status_page.dart';
 import '../medical/medical_records_page.dart';
 import '../pharmacy/pharmacies_page.dart';
@@ -278,7 +279,7 @@ class _HomePageState extends State<HomePage> {
       (Icons.folder_shared_rounded, 'Records', AppColors.warning, () => _open(const MedicalRecordsPage())),
       (Icons.monitor_heart_rounded, 'Health Status', AppColors.error, () => _open(const HealthStatusPage())),
       (Icons.event_note_rounded, 'Appointments', AppColors.primary, () => _open(const AppointmentsPage())),
-      (Icons.menu_book_rounded, 'Health Info', const Color(0xFF7C8CF8), () => _open(const HealthInfoPage())),
+      (Icons.visibility_rounded, 'Eye Check', const Color(0xFF7C8CF8), () => _open(const EyeCheckPage())),
     ];
     return GridView.count(
       crossAxisCount: 4,
@@ -362,6 +363,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               item(Icons.event_available_rounded, 'Book Appointment', () => widget.onSwitchTab(1)),
               item(Icons.monitor_heart_rounded, 'Add Health Reading', () => _open(const HealthStatusPage(openAddDialog: true))),
+              item(Icons.visibility_rounded, 'Eye Check (camera)', () => _open(const EyeCheckPage())),
               item(Icons.upload_file_rounded, 'Add Medical Record', () => _open(const MedicalRecordsPage())),
               item(Icons.local_pharmacy_rounded, 'Order Medicines', () => _open(const PharmaciesPage())),
             ],
