@@ -283,9 +283,9 @@ class SettingsPage extends StatelessWidget {
           const AppCard(
             child: Row(
               children: [
-                IconTile(icon: Icons.info_outline_rounded, size: 40),
+                AppLogo(iconOnly: true, height: 40),
                 SizedBox(width: 14),
-                Expanded(child: Text('Healthcare App v1.0.0\nGraduation Project')),
+                Expanded(child: Text('SOKR - سكر v1.0.0\nGraduation Project')),
               ],
             ),
           ),

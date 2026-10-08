@@ -1,11 +1,11 @@
 {
-    "name": "mshro3eltkhrog",
-    "short_name": "mshro3eltkhrog",
+    "name": "SOKR - سكر",
+    "short_name": "SOKR",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FFFFFF",
+    "theme_color": "#19B8B2",
+    "description": "SOKR - سكر healthcare app",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

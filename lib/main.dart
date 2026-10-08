@@ -25,7 +25,7 @@ class HealthApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Healthcare',
+      title: 'SOKR - سكر',
       theme: AppTheme.light,
       scrollBehavior: const AppScrollBehavior(),
       // law Supabase msh configured bnwareh el user ezay y3mlo badal crash

@@ -519,3 +519,22 @@ String dbDate(DateTime d) =>
     '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
 String money(double v) => 'EGP ${v.toStringAsFixed(v % 1 == 0 ? 0 : 2)}';
+
+// da el logo beta3 el app (SOKR - سكر)
+// iconOnly = el no2ta bas (lel headers), 8er keda el logo kamel bel esm
+class AppLogo extends StatelessWidget {
+  final double height;
+  final bool iconOnly;
+  const AppLogo({super.key, this.height = 80, this.iconOnly = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      iconOnly ? 'assets/logo_icon.png' : 'assets/logo.png',
+      height: height,
+      fit: BoxFit.contain,
+      // law el sora ma-et7amaletsh, n3rd icon badal crash
+      errorBuilder: (_, _, _) => IconTile(icon: Icons.water_drop_rounded, size: height),
+    );
+  }
+}

@@ -101,6 +101,9 @@ class _HomePageState extends State<HomePage> {
       valueListenable: AuthService.instance.profile,
       builder: (context, user, _) => Row(
         children: [
+          // el icon beta3 SOKR
+          const AppLogo(iconOnly: true, height: 44),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

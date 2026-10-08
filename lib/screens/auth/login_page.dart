@@ -71,11 +71,12 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Center(child: IconTile(icon: Icons.monitor_heart_rounded, size: 72)),
-                      const SizedBox(height: 20),
-                      const Text('Your Health\nOur Priority',
+                      // el logo beta3 SOKR - سكر
+                      const AppLogo(height: 130),
+                      const SizedBox(height: 16),
+                      const Text('Your Health, Our Priority',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.2)),
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
                       const SizedBox(height: 8),
                       const Text('Login to your account',
                           textAlign: TextAlign.center,

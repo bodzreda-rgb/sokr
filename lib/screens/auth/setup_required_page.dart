@@ -18,7 +18,7 @@ class SetupRequiredPage extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconTile(icon: Icons.settings_rounded, size: 64),
+                    AppLogo(height: 90),
                     SizedBox(height: 16),
                     Text('Supabase is not configured',
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),

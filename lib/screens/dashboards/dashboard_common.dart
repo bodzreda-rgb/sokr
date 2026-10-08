@@ -18,7 +18,7 @@ class DashboardHeader extends StatelessWidget {
       valueListenable: AuthService.instance.profile,
       builder: (context, user, _) => Row(
         children: [
-          InitialsAvatar(name: user?.fullName ?? '', radius: 24),
+          const AppLogo(iconOnly: true, height: 48),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
